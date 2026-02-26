@@ -15,13 +15,27 @@
 
 void myTask(void *pvParam)
 {
-	while( 1 )
+	while (1)
 	{
-    	printf("This is my first task! I am happy.\n");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+		printf("This is my first task! I am happy.\n");
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
 void app_main(void)
 {
-  xTaskCreate(myTask, "myTask01", 1024, NULL, 1, NULL);
+	TaskHandle_t myTaskHandle = NULL;
+	xTaskCreate(myTask, "myTask01", 1024, NULL, 1, &myTaskHandle);
+
+	vTaskDelay(8000 / portTICK_PERIOD_MS);
+
+	if (myTaskHandle != NULL)
+	{
+		printf("Successfully created myTask.\n");
+
+		vTaskDelete(myTaskHandle);
+	}
+	else
+	{
+		printf("Failed to create myTask.\n");
+	}
 }
