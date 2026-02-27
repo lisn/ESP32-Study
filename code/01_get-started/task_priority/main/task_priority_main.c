@@ -46,7 +46,7 @@ void app_main(void)
 
 	printf("Priority of myTask01 is %d\n", iPriority);
 }
-#else
+#elif 0
 
 void myTask1(void *pvParam)
 {
@@ -76,5 +76,42 @@ void app_main(void)
 	// priority 0 is the lowest, and priority configMAX_PRIORITIES - 1 is the highest. The default configMAX_PRIORITIES is 25, so the valid priority range is 0
 	xTaskCreate(myTask1, "myTask01", 2048, NULL, 1, NULL);
 	xTaskCreate(myTask2, "myTask02", 2048, NULL, 1, NULL);
+}
+#else
+void myTask1(void *pvParam)
+{
+
+	while (1)
+	{
+		printf("Task 1 is running\n");
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+
+	vTaskDelete(NULL);
+}
+
+void myTask2(void *pvParam)
+{
+
+	while (1)
+	{
+		printf("Task 2 is running\n");
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+
+	vTaskDelete(NULL);
+}
+void app_main(void)
+{
+	TaskHandle_t pxTask1 = NULL;
+	
+	xTaskCreate(myTask1, "myTask01", 2048, NULL, 1, &pxTask1);
+	xTaskCreate(myTask2, "myTask02", 2048, NULL, 2, NULL);
+
+	vTaskPrioritySet(pxTask1, 3);
+	
+	UBaseType_t iPriority = uxTaskPriorityGet(pxTask1);
+
+	printf("Priority of myTask01 is %d\n", iPriority);
 }
 #endif
