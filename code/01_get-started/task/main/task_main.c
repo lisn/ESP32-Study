@@ -111,7 +111,7 @@ void app_main(void)
 
 	xTaskCreate(myTask, "myTask01", 2048, (void *)testArray, 1, NULL);
 }
-#else
+#elif 0
 typedef struct A_STUDENT
 {
 	int age;
@@ -142,5 +142,33 @@ void app_main(void)
 {
 
 	xTaskCreate(myTask, "myTask01", 2048, (void *)&xStudent_A, 1, NULL);
+}
+#else
+static const char *sTask = "I am a task.";
+
+void myTask(void *pvParam)
+{
+	char *ptask = (char *)pvParam;
+
+	if (ptask == NULL)
+	{
+		printf("Invalid parameter");
+		vTaskDelete(NULL);
+		return;
+	}
+
+	while (1)
+	{
+		printf("Got message : %s\n",ptask);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+	
+	vTaskDelete(NULL);
+}
+
+void app_main(void)
+{
+
+	xTaskCreate(myTask, "myTask01", 2048, (void *)sTask, 1, NULL);
 }
 #endif
