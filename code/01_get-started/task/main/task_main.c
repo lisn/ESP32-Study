@@ -40,7 +40,7 @@ void app_main(void)
 		printf("Failed to create myTask.\n");
 	}
 }
-#else
+#elif 0
 void myTask(void *pvParam)
 {
 
@@ -53,4 +53,31 @@ void app_main(void)
 
 	xTaskCreate(myTask, "myTask01", 1024, NULL, 1, NULL);
 }
+
+#else
+void myTask(void *pvParam)
+{
+	int *pInt = (int *)pvParam;
+
+	if (pInt == NULL)
+	{
+		printf("Invalid parameter");
+		vTaskDelete(NULL);
+		return;
+	}
+
+	while (1)
+	{
+		printf("Got a num = %d\n",*pInt);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+	vTaskDelete(NULL);
+}
+int testNum = 9;
+void app_main(void)
+{
+
+	xTaskCreate(myTask, "myTask01", 2048, (void *)&testNum, 1, NULL);
+}
+
 #endif
