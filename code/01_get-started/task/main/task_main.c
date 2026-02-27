@@ -54,6 +54,31 @@ void app_main(void)
 	xTaskCreate(myTask, "myTask01", 1024, NULL, 1, NULL);
 }
 
+#elif 0
+void myTask(void *pvParam)
+{
+	int *pInt = (int *)pvParam;
+
+	if (pInt == NULL)
+	{
+		printf("Invalid parameter");
+		vTaskDelete(NULL);
+		return;
+	}
+
+	while (1)
+	{
+		printf("Got a num = %d\n", *pInt);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+	vTaskDelete(NULL);
+}
+int testNum = 9;
+void app_main(void)
+{
+
+	xTaskCreate(myTask, "myTask01", 2048, (void *)&testNum, 1, NULL);
+}
 #else
 void myTask(void *pvParam)
 {
@@ -68,16 +93,22 @@ void myTask(void *pvParam)
 
 	while (1)
 	{
-		printf("Got a num = %d\n",*pInt);
+		// 	printf("Got first num = %d\n",*pInt);
+		// 	printf("Got second num = %d\n",*(pInt + 1));
+		// 	printf("Got third num = %d\n",*(pInt + 2));
+		pInt = (int *)pvParam;
+		printf("Got first num = %d\n", *pInt++);
+		printf("Got second num = %d\n", *pInt++);
+		printf("Got third num = %d\n", *pInt);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
+	
 	vTaskDelete(NULL);
 }
-int testNum = 9;
+int testArray[] = {7, 8, 9};
 void app_main(void)
 {
 
-	xTaskCreate(myTask, "myTask01", 2048, (void *)&testNum, 1, NULL);
+	xTaskCreate(myTask, "myTask01", 2048, (void *)testArray, 1, NULL);
 }
-
 #endif
