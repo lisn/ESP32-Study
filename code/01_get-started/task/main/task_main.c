@@ -79,7 +79,7 @@ void app_main(void)
 
 	xTaskCreate(myTask, "myTask01", 2048, (void *)&testNum, 1, NULL);
 }
-#else
+#elif 0
 void myTask(void *pvParam)
 {
 	int *pInt = (int *)pvParam;
@@ -110,5 +110,37 @@ void app_main(void)
 {
 
 	xTaskCreate(myTask, "myTask01", 2048, (void *)testArray, 1, NULL);
+}
+#else
+typedef struct A_STUDENT
+{
+	int age;
+	int score;
+} xStudent;
+
+void myTask(void *pvParam)
+{
+	xStudent *pStudent = (xStudent *)pvParam;
+
+	if (pStudent == NULL)
+	{
+		printf("Invalid parameter");
+		vTaskDelete(NULL);
+		return;
+	}
+
+	while (1)
+	{
+		printf("age = %d, score = %d\n",pStudent->age, pStudent->score);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+	
+	vTaskDelete(NULL);
+}
+xStudent xStudent_A = {36, 100};
+void app_main(void)
+{
+
+	xTaskCreate(myTask, "myTask01", 2048, (void *)&xStudent_A, 1, NULL);
 }
 #endif
