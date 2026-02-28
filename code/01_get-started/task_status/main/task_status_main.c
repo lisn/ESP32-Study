@@ -53,7 +53,7 @@ void app_main(void)
 	vTaskResume(pxTask1);
 
 }
-#else
+#elif 0
 
 
 void myTask1(void *pvParam)
@@ -98,4 +98,52 @@ void app_main(void)
 
 }
 
+#else
+
+void myTask1(void *pvParam)
+{
+	// Other FreeRTOS API functions must not be called while the scheduler is suspended.
+	// printf() is not thread safe, so it should not be called while the scheduler is suspended.
+	printf("Task 1 start.\n");
+	for (int i = 0; i < 9999; i++)
+	{
+		for (int j = 0; j < 9999; j++)
+		{
+			;
+		}
+	}
+	printf("Task 1 end.\n");
+
+	vTaskDelete(NULL);
+}
+
+void myTask2(void *pvParam)
+{
+
+	while (1)
+	{
+		printf("Task 2 is running\n");
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+
+	vTaskDelete(NULL);
+}
+
+void app_main(void)
+{
+	TaskHandle_t pxTask1 = NULL;
+
+	xTaskCreate(myTask1, "myTask01", 2048, NULL, 1, &pxTask1);
+	xTaskCreate(myTask2, "myTask02", 2048, NULL, 1, NULL);
+
+	static char cBuffer[512];
+	while (1)
+	{
+		/* Pass the buffer into vTaskList() to generate the table of information. */
+		vTaskList(cBuffer);
+		printf("name		state   priority  stack   num\n");
+		printf("%s\n", cBuffer);
+		vTaskDelay(500 / portTICK_PERIOD_MS);
+	}
+}
 #endif
