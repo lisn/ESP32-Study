@@ -131,12 +131,12 @@ void app_main(void)
 	xTaskCreate(sndTask, "sndTask", 2048, (void *)xQueue, 1, NULL);
 	xTaskCreate(recTask, "recTask", 2048, (void *)xQueue, 1, NULL);
 }
-#else
+#elif 0
 typedef struct
 {
 	int id;
 	int data;
-} A_STRUCT ;
+} A_STRUCT;
 
 void sndTask(void *pvParam)
 {
@@ -193,6 +193,71 @@ void app_main(void)
 {
 	QueueHandle_t xQueue;
 	xQueue = xQueueCreate(10, sizeof(A_STRUCT));
+
+	xTaskCreate(sndTask, "sndTask", 2048, (void *)xQueue, 1, NULL);
+	xTaskCreate(recTask, "recTask", 2048, (void *)xQueue, 1, NULL);
+}
+#else
+
+void sndTask(void *pvParam)
+{
+	QueueHandle_t xQueue = (QueueHandle_t)pvParam;
+	char *ptrSend;
+	int i = 0;
+	while (1)
+	{
+		ptrSend = malloc(32);
+		sprintf(ptrSend, "This is a sndTask %d", i++);
+		if (xQueueSend(xQueue, &ptrSend, 0) != pdTRUE)
+		{
+			printf("sndTask send data failed\n");
+		}
+		else
+		{
+			printf("sndTask send data: %s\n", ptrSend);
+		}
+
+		i++;
+
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+	}
+
+	vTaskDelete(NULL);
+}
+
+void recTask(void *pvParam)
+{
+
+	QueueHandle_t xQueue = (QueueHandle_t)pvParam;
+
+	while (1)
+	{
+		int count = uxQueueMessagesWaiting(xQueue);
+		printf("recTask queue count: %d\n", count);
+
+		if (count > 0)
+		{
+			char *ptrRecv;
+			if (xQueueReceive(xQueue, &ptrRecv, 0) == pdTRUE)
+			{
+				printf("recTask rcvd data: %s\n", ptrRecv);
+				free(ptrRecv);
+			}
+			else
+			{
+				printf("recTask receive data failed\n");
+			}
+		}
+
+		vTaskDelay(500 / portTICK_PERIOD_MS);
+	}
+
+	vTaskDelete(NULL);
+}
+void app_main(void)
+{
+	QueueHandle_t xQueue;
+	xQueue = xQueueCreate(10, sizeof(char *));
 
 	xTaskCreate(sndTask, "sndTask", 2048, (void *)xQueue, 1, NULL);
 	xTaskCreate(recTask, "recTask", 2048, (void *)xQueue, 1, NULL);
