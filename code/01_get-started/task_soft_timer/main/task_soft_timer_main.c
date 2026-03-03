@@ -35,9 +35,11 @@ void app_main(void)
 	xTimerStart(xTimer1,0);
 	xTimerStart(xTimer2,0);
 
-	while(1) {
-		xTimerReset(xTimer2,0); // Reset the timer to start counting from zero again
-		vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 seconds
-	}
+	// while(1) {
+	// 	xTimerReset(xTimer2,0); // Reset the timer to start counting from zero again
+	// 	vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 seconds
+	// }
 
+	vTaskDelay(pdMS_TO_TICKS(6000)); // Delay for 6 seconds to allow timers to run before the main task ends
+	xTimerChangePeriod(xTimer1, pdMS_TO_TICKS(6000), 0); // Change the period of timer1 to 500 milliseconds
 }
