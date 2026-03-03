@@ -29,10 +29,15 @@ void app_main(void)
 	// 1000 / PortTICK_PERIOD_MS means the timer will trigger every 1000 milliseconds (1 second)
 	// 1000 / PortTICK_PERIOD_MS = pdMS_TO_TICKS(1000) = 1000 / (1000 / configTICK_RATE_HZ) = configTICK_RATE_HZ
 
-	TimerHandle_t xTimer1 = xTimerCreate("Timer1",1000 / portTICK_PERIOD_MS, pdTRUE, (void *)&timer1_id, timer_callback);
-	TimerHandle_t xTimer2 = xTimerCreate("Timer2",pdMS_TO_TICKS(1000), pdTRUE, (void *)&timer2_id, timer_callback);
+	TimerHandle_t xTimer1 = xTimerCreate("Timer1",pdMS_TO_TICKS(1000), pdTRUE, (void *)&timer1_id, timer_callback);
+	TimerHandle_t xTimer2 = xTimerCreate("Timer2",pdMS_TO_TICKS(2000), pdTRUE, (void *)&timer2_id, timer_callback);
 
 	xTimerStart(xTimer1,0);
 	xTimerStart(xTimer2,0);
+
+	while(1) {
+		xTimerReset(xTimer2,0); // Reset the timer to start counting from zero again
+		vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 seconds
+	}
 
 }
