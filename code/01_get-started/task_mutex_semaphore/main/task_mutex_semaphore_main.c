@@ -15,7 +15,7 @@
 #include "esp_log.h"
 
 SemaphoreHandle_t xMutexHandle;
-
+#if 0
 void task1(void *pvParameters)
 {
 	printf("task1 start\n");
@@ -84,3 +84,70 @@ void app_main(void)
 
 	xTaskResumeAll();
 }
+#else
+
+void task1(void *pvParameters)
+{
+	while (1)
+	{
+		printf("task1 start\n");
+
+		xSemaphoreTakeRecursive(xMutexHandle, portMAX_DELAY);
+		printf("task1 get the mutex A\n");
+		for (int i = 0; i < 10; i++)
+		{
+			printf("task1 A is running, count = %d\n", i);
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
+		}
+		
+		xSemaphoreTakeRecursive(xMutexHandle, portMAX_DELAY);
+		printf("task1 get the mutex B\n");
+		for (int i = 0; i < 10; i++)
+		{
+			printf("task1 B is running, count = %d\n", i);
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
+		}
+
+		printf("task1 give the mutex B\n");
+		xSemaphoreGiveRecursive(xMutexHandle);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+
+		printf("task1 give the mutex A\n");
+		xSemaphoreGiveRecursive(xMutexHandle);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+	}
+}
+
+void task2(void *pvParameters)
+{
+	while (1)
+	{
+		printf("task2 start\n");
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+		xSemaphoreTakeRecursive(xMutexHandle, portMAX_DELAY);
+		printf("task2 get the mutex\n");
+		for (int i = 0; i < 10; i++)
+		{
+			printf("task2 is running, count = %d\n", i);
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
+		}
+
+		printf("task2 give the mutex\n");
+		xSemaphoreGiveRecursive(xMutexHandle);
+		vTaskDelay(3000 / portTICK_PERIOD_MS);
+	}
+}
+
+void app_main(void)
+{
+	xMutexHandle = xSemaphoreCreateRecursiveMutex();
+
+	vTaskSuspendAll();
+
+	xTaskCreate(task1, "task1", 2048, NULL, 1, NULL);
+	xTaskCreate(task2, "task2", 2048, NULL, 1, NULL);
+
+	xTaskResumeAll();
+}
+#endif
