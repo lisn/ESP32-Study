@@ -32,7 +32,7 @@ void task1(void *pvParameters)
 			xEventGroup,   /* The event group being tested. */
 			BIT_0 | BIT_4, /* The bits within the event group to wait for. */
 			pdTRUE,		   /* BIT_0 and BIT_4 should be cleared before returning. */
-			pdFALSE,	   /* Don't wait for both bits, either bit will do. */
+			pdTRUE,	   /* Don't wait for both bits, either bit will do. */
 			// xTicksToWait); /* Wait a maximum of 100ms for either bit to be set. */
 			portMAX_DELAY); /* Wait indefinitely for either bit to be set. */
 		if ((uxBits & (BIT_0 | BIT_4)) == (BIT_0 | BIT_4))
