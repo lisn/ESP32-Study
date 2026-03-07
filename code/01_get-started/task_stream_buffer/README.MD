@@ -39,3 +39,13 @@ for (;;)
 片段1与片段2的区别在vTaskDelay的位置不同。如果sendtask一开始主发数据，rcvtask还没有进入阻塞状态，就会导致，rcvtask第一次接收数据时，打印出sendtask发的数据。
 
 如果sendtask不发数据，让度CPU，让rcvtask进入阻塞状态，rcvtask，只会等sendtask发的数据不少于xTriggerLevelBytes ，rcvtask两次调度时，才会解除阻塞，接受到数据。
+
+
+
+
+
+```size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer )```
+
+监控stream buffer剩余的大小，合理调整xBufferSizeBytes的大小。
+
+xBufferSizeBytes的大小不能小于xTriggerLevelBytes 的大小。

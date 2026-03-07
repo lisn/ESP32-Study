@@ -43,9 +43,27 @@ void rcvTask(void *pvParameters)
 		printf("recv len: %d, recv data: %s\n", recvlen, rx_buf);
 	}
 }
+
+void computeTask(void *pvParameters)
+{
+	int buf_space;
+	int min_buf_space =  1000;
+	for (;;)
+	{
+		buf_space = xStreamBufferSpacesAvailable(xStreamBuffer);
+		if (buf_space < min_buf_space)
+		{
+			min_buf_space = buf_space;
+		}
+		printf("**********************************\n");
+		printf("buf space: %d, min buf space: %d\n", buf_space, min_buf_space);
+		vTaskDelay(pdMS_TO_TICKS(500));
+	}
+}
 void app_main(void)
 {
-	xStreamBuffer = xStreamBufferCreate(1024, 50);
+	// xStreamBuffer = xStreamBufferCreate(1024, 50);
+	xStreamBuffer = xStreamBufferCreate(100, 50);
 	if (xStreamBuffer == NULL)
 	{
 		/* There was not enough heap memory space available to create the
@@ -59,6 +77,7 @@ void app_main(void)
 		vTaskSuspendAll();
 		xTaskCreate(sendTask, "sendTask", 2048, NULL, 1, NULL);
 		xTaskCreate(rcvTask, "rcvTask", 2048, NULL, 1, NULL);
+		xTaskCreate(computeTask, "computeTask", 2048, NULL, 1, NULL);
 		xTaskResumeAll();
 	}
 }
